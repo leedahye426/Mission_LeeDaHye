@@ -1,10 +1,11 @@
 package com.ll;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class App {
-    private final Scanner scanner;
+    private Scanner scanner;
     private int lastQuotationId;
     private ArrayList<Quotation> quotations;
 
@@ -12,6 +13,7 @@ public class App {
         scanner = new Scanner(System.in);
         lastQuotationId = 0;
         quotations = new ArrayList<>();
+        loadQuotationListFromFile();
     }
 
     public void run() {
@@ -22,6 +24,7 @@ public class App {
             String cmd = scanner.nextLine();
 
             if (cmd.equals("종료")) {
+                saveQuotationListToFile();
                 return;
             } else if (cmd.equals("등록")) {
                 actionWrite();
@@ -141,5 +144,27 @@ public class App {
 
         }
         return defaultValue;
+    }
+
+    //quotations 리스트를 파일에 저장
+    //ObjectOutputStream : 객체를 직렬화하여 출력 스트림에 쓸 수 있게 해주는 클래스
+    private void  saveQuotationListToFile() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("quotations.dat"))) {
+            oos.writeObject(quotations);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //파일에서 명언 데이터를 읽어오는 역할
+    //ObjectInputStream 클래스를 사용하여 직렬화된 객체를 역직렬화하고, quotations 리스트에 저장
+    private void loadQuotationListFromFile() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("quotations.dat"))) {
+            quotations = (ArrayList<Quotation>) ois.readObject();
+        } catch (FileNotFoundException e) {
+            quotations = new ArrayList<>();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
