@@ -4,8 +4,10 @@ import java.util.Scanner;
 
 public class App {
     private final Scanner scanner;
+    private int lastQuotationId;
     public App() {
         scanner = new Scanner(System.in);
+        lastQuotationId = 0;
     }
     public void run() {
         System.out.println("== 명언 앱 ==");
@@ -31,6 +33,10 @@ public class App {
         System.out.print("작가 : ");
         String author = scanner.nextLine();
 
-        System.out.println("1번 명언이 등록되었습니다.");
+        lastQuotationId++;
+        int id = lastQuotationId;
+        Quotation quotation = new Quotation(id, content, author);
+
+        System.out.printf("%d번 명언이 등록되었습니다.\n", quotation.getId());
     }
 }
