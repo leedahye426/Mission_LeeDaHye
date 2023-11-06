@@ -29,6 +29,8 @@ public class App {
                 actionList();
             } else if (cmd.startsWith("삭제")) {
                 actionRemove(cmd);
+            } else if ( cmd.startsWith("수정")) {
+                actionModify(cmd);
             }
         }
 
@@ -70,6 +72,33 @@ public class App {
         if(index != -1) {
             quotations.remove(index);
             System.out.printf("%d번 명언이 삭제되었습니다.\n", id);
+        } else {
+            System.out.printf("%d번 명언은 존재하지 않습니다.\n", id);
+        }
+    }
+
+    private void actionModify(String cmd) {
+        int id = getparamValue(cmd, "id", 0);
+        if(id == 0) {
+            System.out.println("id를 정확하게 입력해주세요");
+            return;
+        }
+        int index = findIndexById(id);
+        if(index != -1) {
+            Quotation quotation = quotations.get(index);
+
+            System.out.printf("명언(기존) : %s\n", quotation.getContent());
+            System.out.print("명언 : ");
+            String newContent = scanner.nextLine();
+            quotation.setContent(newContent);
+
+            System.out.printf("작가(기존) : %s\n", quotation.getAuthor());
+            System.out.print("작가 :");
+            String newAuthor = scanner.nextLine();
+            quotation.setAuthor(newAuthor);
+
+            System.out.printf("%d번 명언이 수정되었습니다.\n", id);
+
         } else {
             System.out.printf("%d번 명언은 존재하지 않습니다.\n", id);
         }
