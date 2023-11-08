@@ -1,5 +1,8 @@
 package com.ll;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -32,8 +35,10 @@ public class App {
                 actionList();
             } else if (cmd.startsWith("삭제")) {
                 actionRemove(cmd);
-            } else if ( cmd.startsWith("수정")) {
+            } else if (cmd.startsWith("수정")) {
                 actionModify(cmd);
+            } else if (cmd.equals("빌드")) {
+                actionsBuild();
             }
         }
 
@@ -67,12 +72,12 @@ public class App {
 
     private void actionRemove(String cmd) {
         int id = getparamValue(cmd, "id", 0);
-        if(id == 0) {
+        if (id == 0) {
             System.out.println("id를 정확하게 입력해주세요");
             return;
         }
         int index = findIndexById(id);
-        if(index != -1) {
+        if (index != -1) {
             quotations.remove(index);
             System.out.printf("%d번 명언이 삭제되었습니다.\n", id);
         } else {
@@ -82,12 +87,12 @@ public class App {
 
     private void actionModify(String cmd) {
         int id = getparamValue(cmd, "id", 0);
-        if(id == 0) {
+        if (id == 0) {
             System.out.println("id를 정확하게 입력해주세요");
             return;
         }
         int index = findIndexById(id);
-        if(index != -1) {
+        if (index != -1) {
             Quotation quotation = quotations.get(index);
 
             System.out.printf("명언(기존) : %s\n", quotation.getContent());
@@ -109,8 +114,8 @@ public class App {
 
     private int findIndexById(int id) {
         int index = 0;
-        for(Quotation quotation : quotations) {
-            if(quotation.getId() == id) {
+        for (Quotation quotation : quotations) {
+            if (quotation.getId() == id) {
                 return index;
             } else {
                 index++;
@@ -120,22 +125,22 @@ public class App {
     }
 
     private int getparamValue(String cmd, String paramName, int defaultValue) {
-        String[] cmdBits= cmd.split("\\?", 2);
+        String[] cmdBits = cmd.split("\\?", 2);
 
-        if(cmdBits.length == 1) return defaultValue;
+        if (cmdBits.length == 1) return defaultValue;
 
         String action = cmdBits[0];
         String queryStrings = cmdBits[1];
 
         String[] queryStringBits = queryStrings.split("&");
-        for(String queryStringBit : queryStringBits) {
+        for (String queryStringBit : queryStringBits) {
             String[] queryString = queryStringBit.split("=", 2);
-            if(queryString.length == 1) return defaultValue;
+            if (queryString.length == 1) return defaultValue;
             String param = queryString[0];
             String value = queryString[1];
 
             try {
-                if(param.equals(paramName)) {
+                if (param.equals(paramName)) {
                     return Integer.parseInt(value);
                 }
             } catch (Exception e) {
@@ -148,7 +153,7 @@ public class App {
 
     //quotations 리스트를 파일에 저장
     //ObjectOutputStream : 객체를 직렬화하여 출력 스트림에 쓸 수 있게 해주는 클래스
-    private void  saveQuotationListToFile() {
+    private void saveQuotationListToFile() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("quotations.dat"))) {
             oos.writeObject(quotations);
         } catch (IOException e) {
@@ -167,4 +172,20 @@ public class App {
             e.printStackTrace();
         }
     }
+
+    private void actionsBuild() {
+        String fileName = "data.json";
+        saveQuotationListToJsonFile(fileName);
+        System.out.printf("%s 파일의 내용이 갱신되었습니다.\n", fileName);
+    }
+
+    private void saveQuotationListToJsonFile(String fileName) {
+        try (FileWriter writer = new FileWriter(fileName)) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            gson.toJson(quotations, writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
